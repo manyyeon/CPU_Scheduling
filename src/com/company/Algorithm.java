@@ -51,46 +51,43 @@ class Algorithm {
             priorityQueue.add(processList.get(i));
         }
 
-        int tmpComplete = 0;
-        int tmpStart = 0;
-        int tmpEnd = 0;
-        ProcessingTime tmpProcessingTime;
+        Present present = new Present(); // 임시 값들
         for(int i=0; i< processNum; i++){
             // ganttChartInformation[0]이 FCFS
             // 현재 실행 중인 프로세스
-            Process presentProcess = priorityQueue.poll();
+            present.process = priorityQueue.poll();
             // 이 프로세스의 complete time
-            tmpComplete += presentProcess.burstTime;
-            ganttChartInformation[0].completeTime[presentProcess.id-1] = tmpComplete;
+            present.complete += present.process.burstTime;
+            ganttChartInformation[0].completeTime[present.process.id-1] = present.complete;
 
             // 이 프로세스의 start, end
-            tmpProcessingTime = new ProcessingTime();
-            tmpEnd += presentProcess.burstTime;
-            tmpProcessingTime.start = tmpStart;
-            tmpProcessingTime.end = tmpEnd;
-            tmpProcessingTime.burst = tmpProcessingTime.end - tmpProcessingTime.start;
-            ganttChartInformation[0].processingTime[presentProcess.id-1].add(tmpProcessingTime);
+            present.processingTime = new ProcessingTime();
+            present.end += present.process.burstTime;
+            present.processingTime.start = present.start;
+            present.processingTime.end = present.end;
+            present.processingTime.burst = present.processingTime.end - present.processingTime.start;
+            ganttChartInformation[0].processingTime[present.process.id-1].add(present.processingTime);
 
             // 이 프로세스의 turnaround time
             // complete time - arrival time
-            ganttChartInformation[0].turnaroundTime[presentProcess.id-1] = tmpComplete - presentProcess.arrivalTime;
+            ganttChartInformation[0].turnaroundTime[present.process.id-1] = present.complete - present.process.arrivalTime;
 
             // 전체 turnaround time
             // turnaroundTime[0]이 FCFS
             // 현재 프로세스의 turnaround time을 전체에 더해주기
-            turnaroundTime[0].total += ganttChartInformation[0].turnaroundTime[presentProcess.id-1];
+            turnaroundTime[0].total += ganttChartInformation[0].turnaroundTime[present.process.id-1];
 
             // 이 프로세스의 wait time
             // 프로세스 start time - arrival time
-            ganttChartInformation[0].waitTime[presentProcess.id-1] = tmpProcessingTime.start - presentProcess.arrivalTime;
+            ganttChartInformation[0].waitTime[present.process.id-1] = present.processingTime.start - present.process.arrivalTime;
 
             // 전체 wait time
             // waitingTime[0]이 FCFS
             // 현재 프로세스의 wait time을 전체에 더해주기
-            waitingTime[0].total += ganttChartInformation[0].waitTime[presentProcess.id-1];
+            waitingTime[0].total += ganttChartInformation[0].waitTime[present.process.id-1];
 
             // 다음 프로세스의 시작 시간 = 현재 프로세스 완료시간
-            tmpStart = tmpComplete;
+            present.start = present.complete;
         }
 
         turnaroundTime[0].avg = turnaroundTime[0].total / processNum;
