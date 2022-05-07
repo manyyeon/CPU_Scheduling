@@ -31,30 +31,30 @@ public class Main {
                 System.out.println("프로세스 개수는 최소 4개 이상입니다. 다시 입력하세요.");
             }
         }
+        algorithm = new Algorithm(processNum);
 
         algorithm.processList = new ArrayList<Process>(); // process들을 담는 리스트
-        System.out.print("time quantum 입력 >> ");
-        algorithm.timeQuantum = sc.nextInt();
 
         for(int i=0; i<processNum; i++){
             Process newProcess = new Process();
             newProcess.id = i+1;
-            System.out.println("프로세스 P" + newProcess.id + " 생성");
-            System.out.print("P" + newProcess.id + "의 arrival time : ");
+            System.out.println("프로세스 P" + newProcess.id + " arrival time, burst time, priority 입력");
             newProcess.arrivalTime = sc.nextInt();
-            System.out.print("P" + newProcess.id + "의 burst time : ");
             newProcess.burstTime = sc.nextInt();
-            System.out.print("P" + newProcess.id + "의 priority : ");
             newProcess.priority = sc.nextInt();
 
             algorithm.processList.add(newProcess);
         }
+
+        System.out.print("time quantum 입력 >> ");
+        algorithm.timeQuantum = sc.nextInt();
     }
     public static void main(String[] args) {
 	    Main mainClass = new Main();
-        mainClass.algorithm = new Algorithm();
 
         mainClass.input();
         mainClass.printInitialAllProcess();
+
+        mainClass.algorithm.FCFS();
     }
 }
