@@ -60,5 +60,6 @@ public class Main {
 
         mainClass.algorithm.FCFS();
         mainClass.algorithm.SJF();
+        mainClass.algorithm.Priority();
     }
 }
