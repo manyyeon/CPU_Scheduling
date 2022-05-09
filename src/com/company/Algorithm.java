@@ -4,8 +4,9 @@ import java.util.*;
 
 // 알고리즘 클래스
 class Algorithm {
-    int processNum; // process 개수
     ArrayList<Process> processList; // process 리스트
+    int processNum = 0; // process 개수
+    int totalProcessingTime; // 모든 프로세스 실행이 끝나는 시간
     // algorithmNum : FCFS = 0, SJF = 1, Priority = 2, RR = 3
     ResultTime [] waitingTime = new ResultTime[4]; // 알고리즘 별 대기시간
     ResultTime [] turnaroundTime = new ResultTime[4]; // 알고리즘 별 총처리시간
@@ -51,7 +52,7 @@ class Algorithm {
             priorityQueue.add(processList.get(i));
         }
 
-        Present present = new Present(); // 임시 값들
+        Present present = new Present(); // 현재 값들
         for(int i=0; i< processNum; i++){
             // ganttChartInformation[0]이 FCFS
             // 현재 실행 중인 프로세스
@@ -81,7 +82,7 @@ class Algorithm {
             // 프로세스 start time - arrival time
             ganttChartInformation[0].waitTime[present.process.id-1] = present.processingTime.start - present.process.arrivalTime;
 
-            // 전체 wait time
+            // 전체 waiting time
             // waitingTime[0]이 FCFS
             // 현재 프로세스의 wait time을 전체에 더해주기
             waitingTime[0].total += ganttChartInformation[0].waitTime[present.process.id-1];
@@ -97,8 +98,136 @@ class Algorithm {
         // FCFS의 algorithmNum = 0
         printAlgorithmResult(0);
     }
-    public void SJF() {
 
+    public void SJF() {
+        // 초기에 remaining time을 burst time으로 설정
+        Iterator<Process> it = processList.iterator();
+        while(it.hasNext()) {
+            Process tmpProcess = it.next();
+            tmpProcess.remainingTime = tmpProcess.burstTime;
+        }
+
+        // 도착하기 전의 프로세스들을 도착시간이 빠른 기준인 우선순위 큐에 넣음
+        PriorityQueue<Process> beforeArrivalQueue = new PriorityQueue<>(new Comparator<Process>() {
+            @Override
+            public int compare(Process p1, Process p2) {
+                if (p1.arrivalTime > p2.arrivalTime) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        });
+        it = processList.iterator();
+        while (it.hasNext()) {
+            Process tmpProcess = it.next();
+            beforeArrivalQueue.add(tmpProcess);
+        }
+
+        // remaining time이 기준인 readyQ(우선순위 큐) 생성
+        // remaining time이 빠를 수록 우선순위가 높음
+        // remaining time이 같으면 arrival time이 빠를 수록 우선순위가 높음
+        PriorityQueue<Process> readyQ = new PriorityQueue<>(new Comparator<Process>() {
+            @Override
+            public int compare(Process p1, Process p2){
+                if(p1.remainingTime > p2.remainingTime){
+                    return 1;
+                } else if(p1.remainingTime == p2.remainingTime){
+                    if(p1.arrivalTime > p2.arrivalTime){
+                        return 1;
+                    } else{
+                        return -1;
+                    }
+                } else {
+                    return -1;
+                }
+            }
+        });
+
+
+        Present present = new Present(); // 현재 값들
+        // 도착시간이 제일 빠른 프로세스를 readyQ에 넣기
+        readyQ.add(beforeArrivalQueue.remove());
+        // 현재 실행 중인 프로세스 = readyQ에서 꺼내기
+        present.process = readyQ.remove();
+        // 전체시간만큼 1초씩 진행
+        while(present.time <= totalProcessingTime) {
+            // 아직 도착하지 않은 프로세스들 중에 도착시간 == 현재시간인 프로세스가 없을 때까지 반복
+            while (true) {
+                // 아직 도착하지 않은 프로세스가 있고 && 제일 빨리 도착하는 프로세스의 도착시간 == 현재시간
+                if (!beforeArrivalQueue.isEmpty() && beforeArrivalQueue.peek().arrivalTime == present.time) {
+                    // 새로운 프로세스 도착
+                    Process newProcess = beforeArrivalQueue.remove();
+                    // remaining time이 새로운 프로세스 < 실행 중인 프로세스 -> 선점
+                    if (newProcess.remainingTime < present.process.remainingTime) {
+                        // 현재 실행 중이던 프로세스의 processing time 구하기
+                        present.processingTime = new ProcessingTime();
+                        present.end = present.time;
+                        present.processingTime.start = present.start;
+                        present.processingTime.end = present.end;
+                        present.processingTime.burst = present.end - present.start;
+                        // 현재 실행 중이던 프로세스가 실행이 되었을 때만 processing time을 간트차트에 표시
+                        // 같은 시간에 여러 개의 프로세스가 들어왔으면 remaining time(새 프로세스이므로 burst time)이 가장 짧은 게 실행되기 때문!
+                        // beforeArrivalQueue에서 도착 시간은 같은데 remaining time(burst time)이 더 짧은 게 뒤에 들어오면 앞에껀 burst time = 0 으로 계산될 것임
+                        if (present.processingTime.burst != 0) {
+                            ganttChartInformation[1].processingTime[present.process.id-1].add(present.processingTime);
+                        }
+                        // 실행 중인 프로세스를 readyQ에 넣음
+                        readyQ.add(present.process);
+                        // 새로운 프로세스 실행(선점)
+                        present.process = newProcess;
+                    } else {
+                        // 새로운 프로세스를 readyQ에 넣음
+                        readyQ.add(newProcess);
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            // 프로세스 실행 완료 = 남은 시간이 0
+            if (present.process.remainingTime == 0) {
+                // 완료된 프로세스의 complete time = 현재 시간
+                present.complete = present.time;
+                ganttChartInformation[1].completeTime[present.process.id-1] = present.complete;
+
+                // 완료된 프로세스의 processing time 구하기
+                present.processingTime = new ProcessingTime();
+                present.end = present.time;
+                present.processingTime.start = present.start;
+                present.processingTime.end = present.end;
+                present.processingTime.burst = present.end - present.start;
+                ganttChartInformation[1].processingTime[present.process.id-1].add(present.processingTime);
+
+                // 완료된 프로세스의 wait time = complete time - burst time - arrival time
+                ganttChartInformation[1].waitTime[present.process.id-1] = present.complete - present.processingTime.burst - present.process.arrivalTime;
+
+                // 전체 waiting time
+                waitingTime[1].total += ganttChartInformation[1].waitTime[present.process.id-1];
+
+                // 완료된 프로세스의 turnaround time = complete time - arrival time
+                ganttChartInformation[1].turnaroundTime[present.process.id-1] = present.complete - present.process.arrivalTime;
+
+                // 전체 turnaround time
+                turnaroundTime[1].total += ganttChartInformation[1].turnaroundTime[present.process.id-1];
+
+                // 새로운 프로세스 실행 - remaining time이 가장 짧은 프로세스
+                if (!readyQ.isEmpty()) {
+                    present.process = readyQ.remove();
+                }
+            }
+            present.process.remainingTime -= 1; // 현재 실행 중인 프로세스 남은시간 -= 1
+            present.start = present.end; // 다음 시작 시간 = 현재 끝 시간
+            // 시간 1초 지남
+            present.time += 1;
+        }
+        // 평균 turnaroud time, 평균 waiting time
+        turnaroundTime[1].avg = (double)turnaroundTime[1].total / (double)processNum;
+        waitingTime[1].avg = (double)waitingTime[1].total / (double)processNum;
+
+        // 출력
+        // SJF의 algorithmNum = 1
+        printAlgorithmResult(1);
     }
     public void Priority() {
 

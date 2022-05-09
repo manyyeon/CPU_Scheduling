@@ -44,6 +44,9 @@ public class Main {
             newProcess.priority = sc.nextInt();
 
             algorithm.processList.add(newProcess);
+
+            // 전체 실행시간
+            algorithm.totalProcessingTime += newProcess.burstTime;
         }
 
         System.out.print("time quantum 입력 >> ");
@@ -56,5 +59,6 @@ public class Main {
         mainClass.printInitialAllProcess();
 
         mainClass.algorithm.FCFS();
+        mainClass.algorithm.SJF();
     }
 }
