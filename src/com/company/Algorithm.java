@@ -268,9 +268,9 @@ class Algorithm {
         PriorityQueue<Process> readyQ = new PriorityQueue<>(new Comparator<Process>() {
             @Override
             public int compare(Process p1, Process p2){
-                if(p1.remainingTime > p2.remainingTime){
+                if(p1.priority > p2.priority){
                     return 1;
-                } else if(p1.remainingTime == p2.remainingTime){
+                } else if(p1.priority == p2.priority){
                     if(p1.arrivalTime > p2.arrivalTime){
                         return 1;
                     } else{
