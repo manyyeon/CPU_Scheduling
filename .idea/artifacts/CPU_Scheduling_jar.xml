@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="CPU_Scheduling:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/CPU_Scheduling_jar</output-path>
+    <root id="archive" name="CPU_Scheduling.jar">
+      <element id="module-output" name="CPU_Scheduling" />
+    </root>
+  </artifact>
+</component>

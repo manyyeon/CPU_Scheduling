@@ -4,7 +4,8 @@ import java.util.*;
 
 // 알고리즘 클래스
 class Algorithm {
-    ArrayList<Process> processList; // process 리스트
+    // 여러가지 알고리즘 수행에 필요한 변수들
+    ArrayList<Process> processList; // process들을 담는 리스트
     int processNum = 0; // process 개수
     int totalProcessingTime; // 모든 프로세스 실행이 끝나는 시간
     // algorithmNum : FCFS = 0, SJF = 1, Priority = 2, RR = 3
@@ -23,6 +24,15 @@ class Algorithm {
             turnaroundTime[i] = new ResultTime();
             // 알고리즘 별 간트 차트 정보
             ganttChartInformation[i] = new GanttChartInformation(processNum);
+        }
+    }
+
+    // 초기에 remaining time을 burst time으로 설정
+    public void setRemainingTime() {
+        Iterator<Process> it = processList.iterator();
+        while(it.hasNext()) {
+            Process tmpProcess = it.next();
+            tmpProcess.remainingTime = tmpProcess.burstTime;
         }
     }
 
@@ -63,7 +73,7 @@ class Algorithm {
             present.complete += present.process.burstTime;
             ganttChartInformation[0].completeTime[present.process.id-1] = present.complete;
 
-            // 이 프로세스의 start, end
+            // 이 프로세스의 processing time
             present.processingTime = new ProcessingTime();
             present.end += present.process.burstTime;
             present.processingTime.start = present.start;
@@ -93,6 +103,7 @@ class Algorithm {
             present.start = present.complete;
         }
 
+        // 평균 turnaround time, 평균 waiting time 계산
         turnaroundTime[0].avg = turnaroundTime[0].total / processNum;
         waitingTime[0].avg = waitingTime[0].total / processNum;
 
@@ -105,11 +116,7 @@ class Algorithm {
     // SJF
     public void SJF() {
         // 초기에 remaining time을 burst time으로 설정
-        Iterator<Process> it = processList.iterator();
-        while(it.hasNext()) {
-            Process tmpProcess = it.next();
-            tmpProcess.remainingTime = tmpProcess.burstTime;
-        }
+        setRemainingTime();
 
         // 도착하기 전의 프로세스들을 도착시간이 빠른 기준인 우선순위 큐에 넣음
         PriorityQueue<Process> beforeArrivalQueue = new PriorityQueue<>(new Comparator<Process>() {
@@ -122,14 +129,14 @@ class Algorithm {
                 }
             }
         });
-        it = processList.iterator();
+        Iterator<Process> it = processList.iterator();
         while (it.hasNext()) {
             Process tmpProcess = it.next();
             beforeArrivalQueue.add(tmpProcess);
         }
 
         // remaining time이 기준인 readyQ(우선순위 큐) 생성
-        // remaining time이 빠를 수록 우선순위가 높음
+        // remaining time이 적을 수록 우선순위가 높음
         // remaining time이 같으면 arrival time이 빠를 수록 우선순위가 높음
         PriorityQueue<Process> readyQ = new PriorityQueue<>(new Comparator<Process>() {
             @Override
@@ -239,11 +246,7 @@ class Algorithm {
     // Priority
     public void Priority() {
         // 초기에 remaining time을 burst time으로 설정
-        Iterator<Process> it = processList.iterator();
-        while(it.hasNext()) {
-            Process tmpProcess = it.next();
-            tmpProcess.remainingTime = tmpProcess.burstTime;
-        }
+        setRemainingTime();
 
         // 도착하기 전의 프로세스들을 도착시간이 빠른 기준인 우선순위 큐에 넣음
         PriorityQueue<Process> beforeArrivalQueue = new PriorityQueue<>(new Comparator<Process>() {
@@ -256,7 +259,7 @@ class Algorithm {
                 }
             }
         });
-        it = processList.iterator();
+        Iterator<Process> it = processList.iterator();
         while (it.hasNext()) {
             Process tmpProcess = it.next();
             beforeArrivalQueue.add(tmpProcess);
@@ -366,13 +369,12 @@ class Algorithm {
         // Priority의 algorithmNum = 2
         printAlgorithmResult(2);
     }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // RR
     public void RR() {
         // 초기에 remaining time을 burst time으로 설정
-        Iterator<Process> it = processList.iterator();
-        while(it.hasNext()) {
-            Process tmpProcess = it.next();
-            tmpProcess.remainingTime = tmpProcess.burstTime;
-        }
+        setRemainingTime();
 
         // 도착하기 전의 프로세스들을 도착시간이 빠른 기준인 우선순위 큐에 넣음
         PriorityQueue<Process> beforeArrivalQueue = new PriorityQueue<>(new Comparator<Process>() {
@@ -385,7 +387,7 @@ class Algorithm {
                 }
             }
         });
-        it = processList.iterator();
+        Iterator<Process> it = processList.iterator();
         while (it.hasNext()) {
             Process tmpProcess = it.next();
             beforeArrivalQueue.add(tmpProcess);
@@ -397,7 +399,7 @@ class Algorithm {
         Present present = new Present(); // 현재 값들
         // 전체시간만큼 time quantum초씩 진행
         while(present.time < totalProcessingTime) {
-            // 처음시간이나 어떤 프로세스 실행이 끝난 시간에 들어오는 모든 프로세스들을 readyQ에 넣음
+            // 처음시간 or 어떤 프로세스 실행이 끝난 시간에 들어오는 모든 프로세스들을 readyQ에 넣음
             while (true) {
                 // 아직 도착하지 않은 프로세스가 있고 && 제일 빨리 도착하는 프로세스의 도착시간 == 현재시간
                 if (!beforeArrivalQueue.isEmpty() && beforeArrivalQueue.peek().arrivalTime == present.time) {
@@ -428,7 +430,7 @@ class Algorithm {
                     }
                 }
 
-                // 완료된 프로세스의 complete time = 현재 시간 + 프로세스의 남은 burst time
+                // 완료된 프로세스의 complete time = 현재 시간 + 프로세스의 남은 시간
                 present.complete = present.time + present.process.remainingTime;
                 ganttChartInformation[3].completeTime[present.process.id-1] = present.complete;
 
@@ -470,7 +472,7 @@ class Algorithm {
                     }
                 }
 
-                // 완료된 프로세스의 processing time 구하기
+                // 현재 프로세스의 processing time 구하기
                 present.processingTime = new ProcessingTime();
                 present.end = present.time + timeQuantum; // 끝 시간 = 현재 시간 + time quantum
                 present.processingTime.start = present.start;
@@ -497,8 +499,10 @@ class Algorithm {
         printAlgorithmResult(3);
     }
 
+    // 알고리즘 수행 결과 출력
     public void printAlgorithmResult(int algorithmNum) {
-        String name = "";
+        String name = ""; // 알고리즘 이름
+        // 알고리즘 번호에 따라 이름 설정
         switch(algorithmNum) {
             case 0:
                 name = "FCFS"; break;
@@ -510,7 +514,7 @@ class Algorithm {
                 name = "RR"; break;
         }
 
-        System.out.println("**************" + name + "**************");
+        System.out.println("**************" + name + "**************"); // 알고리즘 이름 출력
         int id; // 프로세스 id
         // 프로세스 별 processing time 출력
         System.out.println("[프로세스 별 processing time]");
