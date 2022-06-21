@@ -177,7 +177,11 @@ Main 클래스의 객체인 mainObject를 생성한다. mainObject의 내부 함
 이 3개의 값을 구한 후에 present.processingTime의 start, end, burst에 값을 각각 넣어주고 이 processingTime을 ganttChartInformation의 인덱스 0(FCFS의 알고리즘 번호가 0번이다.)에 processingTime의 프로세스 id-1 인덱스에 추가해주면 된다. 프로세스 present.processingTime의 start, end 값과 present.start, present.end 값을 따로 쓴 것은 present.start와 present.end는 반복문 전체에서 계속 업데이트 하면서 사용하고 present.processingTime의 start, end는 현재의 processingTime을 구해서 ArrayList에 추가해주기 위한 값이기 때문이다. 
 이 프로세스의 turnaround time은 complete time – arrival time으로 구한다. 알고리즘 별 전체 turnaround time도 구해야 하므로 전체에 더해준다.
 이 프로세스의 wait time은 start time – arrival time으로 구한다. 알고리즘 별 전체 waiting time도 구해야 하므로 전체에 더해준다.
--	Gantt Chart
+
+### Gantt Chart
+<img width="353" alt="image" src="https://user-images.githubusercontent.com/87538540/174726094-e39d8c24-f415-41e8-b5a6-fbeb34718f02.png">
+
+------------
  
 ## 2) SJF
 remaining time을 기준으로 remaining time이 가장 적게 남은 프로세스부터 스케줄링 해주는 알고리즘이다. SJF의 선점형 알고리즘을 SRTF 알고리즘이라고 하기도 한다.
@@ -186,11 +190,21 @@ setRemainingTime() 함수를 이용하여 초기에 remaining time을 burst time
 그 이후, 현재 프로세스가 이 시간에 실행이 완료되었는지 검사한다. 현재 프로세스의 remaining time이 0이 되면 실행이 완료된 것이다. 그러면 complete time, processing time, wait time, turnaround time을 구하고 새로운 프로세스를 실행한다. 새로운 프로세스는 readyQ에서 하나 꺼내면 되는데 remaining time이 가장 짧은 프로세스가 나오게 될 것이다. complete time은 현재 시간이다. processing time은 end는 현재 시간이고 start는 반복문이 끝날 때 end로 계속 설정해주기 때문에 이전 프로세스 실행이 끝난 시간이다. end는 프로세스 실행이 끝날 때마다 업데이트 되기 때문에 start 값은 1초마다 end로 설정해 두어도 현재 프로세스 실행이 끝날 때까지 값을 유지한다. wait time은 complete time – burst time – arrival time이다. 전체 waiting time도 구해야 하기 때문에 전체에도 더해준다. turnaround time은 complete time – arrival time이다. 전체 turnaround time도 구해야 하기 때문에 전체에도 더해준다.
 반복문이 끝나기 전에 현재 프로세스의 remaining time을 1초 빼주고 start를 end로 설정해준다. 현재 시간은 1초가 지난다.
 반복문이 끝나면 turnaround time과 waiting time의 평균을 구하고 printAlgorithmResult() 함수를 이용하여 결과를 출력한다. 매개변수로는 SJF의 algorithmNum인 1을 전달해준다.
--	Gantt Chart
+
+### Gantt Chart
+
+<img width="358" alt="image" src="https://user-images.githubusercontent.com/87538540/174726142-bea17feb-37c0-4571-9c8c-d5d3d6f07f01.png">
+
+-----------
  
 ## 3) Priority
 Priority 알고리즘은 설정된 우선순위가 높은 순서대로 스케줄링 하는 알고리즘이다. Priority 알고리즘도 선점형으로 구현하였다. SJF가 Priority의 한 종류이므로 readyQ의 우선순위 기준만 빼고 다른 건 구현 방법이 모두 같다. readyQ에서 priority 값이 작을 수록 우선순위가 높도록 설정해 두었다.
--	Gantt Chart
+
+### Gantt Chart
+
+<img width="452" alt="image" src="https://user-images.githubusercontent.com/87538540/174726177-996e7303-2943-4e83-86eb-75a2302c4944.png">
+
+--------
  
 ## 4) RR
 RR 알고리즘은 time quantum 마다 현재 실행 중인 프로세스의 실행을 중단하고 새 프로세스를 스케줄 하는 알고리즘이다. 여기서도 반복문이 시간의 흐름에 따라 진행되지만 SJF와 Priority처럼 1초씩 지나는 게 아니라 time quantum초씩 지난다.
@@ -201,7 +215,10 @@ RR 알고리즘은 time quantum 마다 현재 실행 중인 프로세스의 실�
  remaining time이 time quantum보다 작거나 같아서 이번 차례에 이 프로세스 실행을 완료하는 경우, 이 프로세스가 실행되는 동안(끝나기 전에) 들어온 프로세스들 모두를 readyQ에 넣는다. 끝나는 시간에 딱 맞게 들어오는 프로세스들은 어차피 다음 time quantum에서 처음 무한루프에 의해 다 들어오게 될 것이다. readyQ에 모두 넣고 나면 이 프로세스는 이번에 실행이 완료되는 것이기 때문에 complete time, processing time, wait time, turnaround time을 구하고 현재 시간을 이 프로세스의 remaining time만큼 흐르게 하고 이 프로세스의 remaining time을 0으로 설정한다. 여기서 time quantum 대신 remaining time만큼 시간이 흐르게 한 이유는 remaining time이 time quantum보다 작은 경우도 있기 때문이다. 그래서 complete time 계산할 때도 현재 시간 + remaining time으로 계산한다. processing time에서 end는 complete time과 같고 start는 이 프로세스가 시작할 때 설정해 두었다. burst time은 end – start로 구한다. wait time은 complete time – burst time – arrival time이고 전체 waiting time도 구해야 하기 때문에 전체에도 더해준다. turnaround time은 complete time – arrival time이다. 전체 turnaround time도 구해야 하기 때문에 전체에도 더해준다. 이렇게 끝나고 나면 다시 다음 반복이 실행될 때 그 시간에 도착하는 모든 프로세스들을 readyQ에 넣고 readyQ에서 프로세스 하나를 꺼내서 새로 실행하면 된다.
  remaining time이 time quantum보다 크면 time quantum만큼 실행하고 다시 readyQ에 넣어주면 된다. 우선, 이 프로세스가 실행되는 동안(끝나기 전에) 들어온 프로세스들 모두를 reayQ에 넣는다. 현재 프로세스를 time quantum만큼 실행해도 프로세스 실행이 완료되지 않으므로 processing time만 구한다. end는 현재 시간 + time quantum이고 start는 이 프로세스가 스케줄될 때 설정해두었다. burst time은 end – start이다. 그리고 time quantum만큼 시간이 흐르게 하고 이 프로세스의 remaining time에서 time quantum만큼 시간을 뺀다. 마지막으로 readyQ에 이 프로세스를 다시 넣어주면 된다. 그런데 이렇게 하면 현재 실행 중이던 프로세스를 먼저 readyQ에 넣고 그 후에 새로 도착하는 프로세스들을 readyQ에 넣는 것이므로 도착시간과 이 프로세스 실행이 끝난 시간이 같은 경우 실행 중이던 프로세스가 다음 차례에 한번 더 실행되게 된다. 하지만, 다른 프로세스들도 있을 때 3번 이상 연속으로 실행될 수는 없기 때문에 RR 알고리즘의 목적을 만족한다고 할 수 있다. 실행해본 예제에서도 새로 도착하는 프로세스의 도착시간과 프로세스 하나가 time quantum만큼 실행하고 끝나는 시간이 같은 경우가 있다. P1이 1초에 끝나는데 P2가 1초에 들어오는 것이다. 그래서 P1이 다시 한 번 실행이 되고 그 이후에 P2가 실행되었다.
 아무튼 반복문이 끝나고 나면 평균 turnaround time과 평균 waiting time을 구하고 printAlgorithmResult() 함수를 통해 결과를 출력하면 된다. 매개변수로 RR 알고리즘의 algorithmNum인 3을 전달해주었다.
- 
+
+<img width="452" alt="image" src="https://user-images.githubusercontent.com/87538540/174726277-a82ea4f1-e21c-4b49-bed4-d3073635f2e9.png">
+
+--------
  
 # 4. 실행결과
    
