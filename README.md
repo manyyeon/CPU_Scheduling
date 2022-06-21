@@ -143,7 +143,9 @@ int time quantum; // time quantum
 
 ### 함수
 ```setRemainingTime()```
+
 초기에 remaining time을 burst time으로 설정하는 함수
+
 processList에 접근해서 processList에 들어있는 모든 프로세스들의 remaining time을 burst time으로 설정해둠
 알고리즘 시작할 때 이 함수로 초기화를 한다.
 
@@ -162,11 +164,12 @@ RR 알고리즘을 수행하는 함수
 ```printAlgorithmResult()```
 알고리즘 수행 결과를 출력해준다. 매개변수로 algorithmNum을 받아서 번호에 따라 이름을 설정한다. 0은 FCFS, 1은 SJF, 2는 Priority, 3은 RR이다. ganttChartInformation과 waitingTime, turnaroundTime 변수에 접근하여 알고리즘 번호에 따른 저장된 정보들을 모두 출력해준다.
 
-2.	프로그램 작동 흐름
+# 2. 프로그램 작동 흐름
 Main 클래스의 객체인 mainObject를 생성한다. mainObject의 내부 함수인 input()를 이용하여 프로세스 개수, 프로세스들의 정보, time quantum를 입력받고 프로세스 개수를 매개변수로 넘겨주면서 algorithm 객체를 생성한다. algorithm 객체 안에 있는 processList에 직접 접근하여 입력 받은 프로세스들을 넣어준다. 그리고 전체 프로세스 실행 시간도 구한다. 그 이후, printInitialAllProcess() 함수로 입력 받은 정보를 출력해준다.
  algorithm 객체에서 각각의 알고리즘 함수를 호출하여 알고리즘을 수행하고 printAlgorithmResult() 함수를 이용하여 결과를 출력해준다. 모든 정보들은 알고리즘 클래스 안에 변수로 정의되어 있으며 구조를 효율적으로 사용하기 위해 ResultTime 클래스, Present 클래스, Process 클래스, ProcessingTime 클래스, GanttChartInformation 클래스를 만들었다. 모든 정보는 Algorithm 클래스에 있지만 세부적인 내용을 쪼개서 담은 것이다.
-3.	알고리즘 구현 방법 설명
-1)	FCFS
+
+# 3. 알고리즘 구현 방법 설명
+## 1) FCFS
 먼저 온 프로세스를 먼저 처리해주는 알고리즘이다. 비선점형이므로 모든 프로세스가 1번씩 처리되어 완료될 때까지 프로세스 개수만큼 반복문을 돌리면 된다.
 우선, arrival time이 기준인 우선순위 큐를 생성한다. arrival time이 빠를 수록 우선순위가 높아. 만약 arrival time이 같은 프로세스가 있다면 그냥 임의로 프로세스 id 번호가 작을 수록 우선순위가 높게 설정해 놓았다. 그 이후, 우선순위 큐에 모든 프로세스들을 넣어준다.
 현재 값들을 저장해둘 Present 클래스의 객체인 present를 생성해준다. 프로세스 개수만큼 반복문을 실행한다. 우선순위 큐에서 프로세스 하나를 꺼내서(그럼 도착 시간이 가장 빠른 프로세스가 꺼내진다.) 현재 실행 중인 프로세스인 present.process에 설정해 둔다. 어차피 FCFS에서는 프로세스들이 한 번 처리될 때 끝까지 처리되고 종료되므로 바로 complete time을 구해준다. 현재 complete time은 이전 complete time에 현재 프로세스의 burst time을 더한 값이다.
@@ -176,7 +179,7 @@ Main 클래스의 객체인 mainObject를 생성한다. mainObject의 내부 함
 이 프로세스의 wait time은 start time – arrival time으로 구한다. 알고리즘 별 전체 waiting time도 구해야 하므로 전체에 더해준다.
 -	Gantt Chart
  
-2)	SJF
+## 2) SJF
 remaining time을 기준으로 remaining time이 가장 적게 남은 프로세스부터 스케줄링 해주는 알고리즘이다. SJF의 선점형 알고리즘을 SRTF 알고리즘이라고 하기도 한다.
 setRemainingTime() 함수를 이용하여 초기에 remaining time을 burst time으로 설정해둔다. 여기서는 큐를 2개 사용하였다. 도착시간 순서대로 초기에 모든 프로세스를 넣어 놓는 beforeArrivalQueue와 remaining time을 기준으로 remaining time이 적을 수록 우선순위가 높은 readyQ이다. 여기서 remaining time이 같으면 arrival time이 빠른 순서대로 정렬되도록 하였다. 현재 시간을 0초부터 모든 프로세스 수행이 끝나는 시간인 totalProcessingTime까지 1초씩 움직이면서 현재시간과 beforeArrivalQueue에 있는 프로세스의 도착시간이 같으면 프로세스가 도착한다고 하는 것이다. 어떤 시간에 여러 프로세스들이 한꺼번에 도착할 수도 있기 때문에 무한루프로 설정해두고 이 시간에 도착하는 프로세스가 더 이상 없으면 무한루프를 빠져나가게 설정해 두었다.
  새로운 프로세스가 도착하면 선점을 해서 바로 실행할지 readyQ에 넣을지 결정한다. 새로운 프로세스의 burst time(그런데 어차피 remaining time의 초기 설정을 burst time으로 해 두었기 때문에 remaining time으로 전부 비교했다.)이 실행 중인 프로세스의 remaining time보다 짧으면 선점하고 실행한다. 현재 실행 중이던 프로세스는 processing time을 구해서 ganttChartInformation에 추가해두고 readyQ에 넣는다. 그리고 새 프로세스를 현재 프로세스 즉, present.process로 설정한다. 만약 새로운 프로세스의 burst time이 실행 중인 remaining time보다 길면 새로운 프로세스를 바로 readyQ에 넣는다. 이렇게 이 시간에 도착하는 모든 프로세스에 대해 검사를 진행하면 된다.
@@ -185,11 +188,11 @@ setRemainingTime() 함수를 이용하여 초기에 remaining time을 burst time
 반복문이 끝나면 turnaround time과 waiting time의 평균을 구하고 printAlgorithmResult() 함수를 이용하여 결과를 출력한다. 매개변수로는 SJF의 algorithmNum인 1을 전달해준다.
 -	Gantt Chart
  
-3)	Priority
+## 3) Priority
 Priority 알고리즘은 설정된 우선순위가 높은 순서대로 스케줄링 하는 알고리즘이다. Priority 알고리즘도 선점형으로 구현하였다. SJF가 Priority의 한 종류이므로 readyQ의 우선순위 기준만 빼고 다른 건 구현 방법이 모두 같다. readyQ에서 priority 값이 작을 수록 우선순위가 높도록 설정해 두었다.
 -	Gantt Chart
  
-4)	RR
+## 4) RR
 RR 알고리즘은 time quantum 마다 현재 실행 중인 프로세스의 실행을 중단하고 새 프로세스를 스케줄 하는 알고리즘이다. 여기서도 반복문이 시간의 흐름에 따라 진행되지만 SJF와 Priority처럼 1초씩 지나는 게 아니라 time quantum초씩 지난다.
  우선, setRemainingTime() 함수로 초기에 remaining time을 burst time으로 설정한다. 그리고 beforeArrivalQueue에 모든 프로세스를 넣어 도착 시간이 빠른 순서대로 꺼낼 수 있게 해둔다. readyQ도 생성하는데 여기서는 우선순위 큐가 아니라 그냥 선입선출 큐이다. Present 클래스의 present 객체를 생성하고 반복문을 시작한다.
  반복문은 0초부터 시작해서 모든 프로세스의 실행이 끝나는 시간인 totalProcessingTime까지 time quantum초씩 진행한다.
@@ -200,5 +203,5 @@ RR 알고리즘은 time quantum 마다 현재 실행 중인 프로세스의 실�
 아무튼 반복문이 끝나고 나면 평균 turnaround time과 평균 waiting time을 구하고 printAlgorithmResult() 함수를 통해 결과를 출력하면 된다. 매개변수로 RR 알고리즘의 algorithmNum인 3을 전달해주었다.
  
  
-4.	실행결과
+# 4. 실행결과
    
