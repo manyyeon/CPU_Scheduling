@@ -221,4 +221,8 @@ RR 알고리즘은 time quantum 마다 현재 실행 중인 프로세스의 실�
 --------
  
 # 4. 실행결과
-   
+<img width="261" alt="image" src="https://user-images.githubusercontent.com/87538540/174726442-51c92f32-0f5b-4612-a934-221f61961876.png">
+
+<img width="231" alt="image" src="https://user-images.githubusercontent.com/87538540/174726451-f4edf845-7b78-4de2-aeb4-eba020cb3ba7.png">
+
+<img width="452" alt="image" src="https://user-images.githubusercontent.com/87538540/174726473-6d9d8eef-378b-4157-af08-32ecf85a3151.png">
