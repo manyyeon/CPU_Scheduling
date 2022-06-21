@@ -216,7 +216,7 @@ RR 알고리즘은 time quantum 마다 현재 실행 중인 프로세스의 실�
  remaining time이 time quantum보다 크면 time quantum만큼 실행하고 다시 readyQ에 넣어주면 된다. 우선, 이 프로세스가 실행되는 동안(끝나기 전에) 들어온 프로세스들 모두를 reayQ에 넣는다. 현재 프로세스를 time quantum만큼 실행해도 프로세스 실행이 완료되지 않으므로 processing time만 구한다. end는 현재 시간 + time quantum이고 start는 이 프로세스가 스케줄될 때 설정해두었다. burst time은 end – start이다. 그리고 time quantum만큼 시간이 흐르게 하고 이 프로세스의 remaining time에서 time quantum만큼 시간을 뺀다. 마지막으로 readyQ에 이 프로세스를 다시 넣어주면 된다. 그런데 이렇게 하면 현재 실행 중이던 프로세스를 먼저 readyQ에 넣고 그 후에 새로 도착하는 프로세스들을 readyQ에 넣는 것이므로 도착시간과 이 프로세스 실행이 끝난 시간이 같은 경우 실행 중이던 프로세스가 다음 차례에 한번 더 실행되게 된다. 하지만, 다른 프로세스들도 있을 때 3번 이상 연속으로 실행될 수는 없기 때문에 RR 알고리즘의 목적을 만족한다고 할 수 있다. 실행해본 예제에서도 새로 도착하는 프로세스의 도착시간과 프로세스 하나가 time quantum만큼 실행하고 끝나는 시간이 같은 경우가 있다. P1이 1초에 끝나는데 P2가 1초에 들어오는 것이다. 그래서 P1이 다시 한 번 실행이 되고 그 이후에 P2가 실행되었다.
 아무튼 반복문이 끝나고 나면 평균 turnaround time과 평균 waiting time을 구하고 printAlgorithmResult() 함수를 통해 결과를 출력하면 된다. 매개변수로 RR 알고리즘의 algorithmNum인 3을 전달해주었다.
 
-<img width="452" alt="image" src="https://user-images.githubusercontent.com/87538540/174726277-a82ea4f1-e21c-4b49-bed4-d3073635f2e9.png">
+<img width="516" alt="image" src="https://user-images.githubusercontent.com/87538540/174726375-6c74d7ff-fdcd-4503-9dd7-7406c7011f88.png">
 
 --------
  
